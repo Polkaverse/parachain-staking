@@ -24,6 +24,7 @@ smallvec = "1.6.1"
 
 # Local
 pallet-template = { path = "../pallets/template", default-features = false }
+parachain-staking = 	{ path = "../pallets/parachain-staking",   default-features = false }
 
 # Substrate
 frame-benchmarking = { git = "https://github.com/paritytech/substrate", default-features = false, optional = true, branch = "polkadot-v0.9.24" }
@@ -103,6 +104,7 @@ std = [
 	"pallet-session/std",
 	"pallet-sudo/std",
 	"pallet-template/std",
+	"parachain-staking/std",
 	"pallet-timestamp/std",
 	"pallet-transaction-payment-rpc-runtime-api/std",
 	"pallet-transaction-payment/std",

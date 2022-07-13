@@ -1,4 +1,5 @@
 use cumulus_primitives_core::ParaId;
+// use frame_benchmarking::frame_support::metadata::StorageEntryModifier::Default;
 use parachain_template_runtime::{AccountId, AuraId, Signature, EXISTENTIAL_DEPOSIT};
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
@@ -217,5 +218,6 @@ fn testnet_genesis(
 		polkadot_xcm: parachain_template_runtime::PolkadotXcmConfig {
 			safe_xcm_version: Some(SAFE_XCM_VERSION),
 		},
+		parachain_staking: Default::default(),
 	}
 }
