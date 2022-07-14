@@ -536,16 +536,16 @@ impl cumulus_pallet_dmp_queue::Config for Runtime {
 impl pallet_author_inherent::Config for Runtime {
 	type SlotBeacon = cumulus_pallet_parachain_system::RelaychainBlockNumberProvider<Self>;
 	type AccountLookup = PotentialAuthorSet;
-	type EventHandler = ();
+	type EventHandler = ParachainStaking;
 	type CanAuthor = AuthorFilter;
-	type WeightInfo = ();
+	type WeightInfo = pallet_author_inherent::weights::SubstrateWeight<Runtime>;
 }
 
 impl pallet_author_slot_filter::Config for Runtime {
 	type Event = Event;
 	type RandomnessSource = RandomnessCollectiveFlip;
-	type PotentialAuthors = PotentialAuthorSet;
-	type WeightInfo = ();
+	type PotentialAuthors = ParachainStaking;
+	type WeightInfo = pallet_author_slot_filter::weights::SubstrateWeight<Runtime>;
 }
 
 impl pallet_account_set::Config for Runtime {}

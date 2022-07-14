@@ -1,5 +1,5 @@
 use cumulus_primitives_core::ParaId;
-use parachain_template_runtime::{AccountId, NimbusId, Signature};
+use parachain_template_runtime::{AccountId, NimbusId, Signature, };
 use sc_chain_spec::{ChainSpecExtension, ChainSpecGroup};
 use sc_service::ChainType;
 use serde::{Deserialize, Serialize};
