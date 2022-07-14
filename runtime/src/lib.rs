@@ -60,7 +60,7 @@ use xcm_builder::{
 	SovereignSignedViaLocation, TakeWeightCredit, UsingComponents,
 };
 use xcm_executor::{Config, XcmExecutor};
-// mod pallet_account_set;
+ mod pallet_account_set;
 /// Import the template pallet.
 pub use pallet_template;
 
@@ -535,7 +535,7 @@ impl cumulus_pallet_dmp_queue::Config for Runtime {
 
 impl pallet_author_inherent::Config for Runtime {
 	type SlotBeacon = cumulus_pallet_parachain_system::RelaychainBlockNumberProvider<Self>;
-	type AccountLookup = ();
+	type AccountLookup = PotentialAuthorSet;
 	type EventHandler = ();
 	type CanAuthor = AuthorFilter;
 	type WeightInfo = ();
@@ -544,11 +544,11 @@ impl pallet_author_inherent::Config for Runtime {
 impl pallet_author_slot_filter::Config for Runtime {
 	type Event = Event;
 	type RandomnessSource = RandomnessCollectiveFlip;
-	type PotentialAuthors = ();
+	type PotentialAuthors = PotentialAuthorSet;
 	type WeightInfo = ();
 }
 
-// impl pallet_account_set::Config for Runtime {}
+impl pallet_account_set::Config for Runtime {}
 
 
 /// Configure the pallet template in pallets/template.
@@ -630,7 +630,7 @@ construct_runtime!(
 		// Nimbus support. The order of these are important and shall not change.
 		AuthorInherent: pallet_author_inherent::{Pallet, Call, Storage, Inherent} = 20,
 		AuthorFilter: pallet_author_slot_filter::{Pallet, Storage, Event, Config} = 21,
-		// PotentialAuthorSet: pallet_account_set::{Pallet, Storage, Config<T>} = 22,
+		PotentialAuthorSet: pallet_account_set::{Pallet, Storage, Config<T>} = 22,
 
 		// XCM helpers.
 		XcmpQueue: cumulus_pallet_xcmp_queue::{Pallet, Call, Storage, Event<T>} = 30,

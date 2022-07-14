@@ -185,9 +185,9 @@ fn testnet_genesis(
 		author_filter: parachain_template_runtime::AuthorFilterConfig {
 			eligible_count: parachain_template_runtime::EligibilityValue::default(),
 		},
-		// potential_author_set: parachain_template_runtime::PotentialAuthorSetConfig {
-		// 	mapping: invulnerables,
-		// },
+		potential_author_set: parachain_template_runtime::PotentialAuthorSetConfig {
+			mapping: invulnerables,
+		},
 		parachain_system: Default::default(),
 		parachain_staking: Default::default(),
 	}
