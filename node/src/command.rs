@@ -9,7 +9,7 @@ use cumulus_primitives_core::ParaId;
 use frame_benchmarking_cli::BenchmarkCmd;
 use log::info;
 use parachain_template_runtime::{Block, RuntimeApi};
-use polkadot_parachain::primitives::AccountIdConversion;
+use sp_runtime::traits::AccountIdConversion;
 use sc_cli::{
 	ChainSpec, CliConfiguration, DefaultConfigurationValues, ImportParams, KeystoreParams,
 	NetworkParams, Result, RuntimeVersion, SharedParams, SubstrateCli,
@@ -259,7 +259,12 @@ pub fn run() -> Result<()> {
 					cmd.run(config, partials.client.clone(), db, storage)
 				}),
 				BenchmarkCmd::Overhead(_) => Err("Unsupported benchmarking command".into()),
-				BenchmarkCmd::Machine(cmd) => runner.sync_run(|config| cmd.run(&config)),
+				BenchmarkCmd::Machine(cmd) => runner.sync_run(|config| {
+					cmd.run(
+						&config,
+						frame_benchmarking_cli::SUBSTRATE_REFERENCE_HARDWARE.clone(),
+					)
+				}),
 			}
 		}
 		Some(Subcommand::RunInstantSeal(run_cmd)) => {
@@ -287,7 +292,7 @@ pub fn run() -> Result<()> {
 				let id = ParaId::from(para_id);
 
 				let parachain_account =
-					AccountIdConversion::<polkadot_primitives::v2::AccountId>::into_account(&id);
+					AccountIdConversion::<polkadot_primitives::v2::AccountId>::into_account_truncating(&id);
 
 				let state_version =
 					RelayChainCli::native_runtime_version(&config.chain_spec).state_version();

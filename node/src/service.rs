@@ -2,7 +2,7 @@
 
 // std
 use std::{sync::Arc, time::Duration};
-
+use log::Metadata;
 // Local Runtime Types
 use parachain_template_runtime::{
 	opaque::Block, AccountId, Balance, Hash, Index as Nonce, RuntimeApi,
@@ -32,6 +32,7 @@ use sc_consensus_manual_seal::{run_instant_seal, InstantSealParams};
 use sc_executor::NativeElseWasmExecutor;
 use sc_network::NetworkService;
 use sc_service::{Configuration, PartialComponents, Role, TFullBackend, TFullClient, TaskManager};
+use sc_sysinfo::HwBench;
 use sc_telemetry::{Telemetry, TelemetryHandle, TelemetryWorker, TelemetryWorkerHandle};
 use sp_api::ConstructRuntimeApi;
 use sp_keystore::SyncCryptoStorePtr;
@@ -142,6 +143,7 @@ where
 
 	let import_queue = nimbus_consensus::import_queue(
 		client.clone(),
+		client.clone(),
 		move |_, _| async move {
 			let time = sp_timestamp::InherentDataProvider::from_system_time();
 			Ok((time,))
@@ -185,6 +187,7 @@ async fn build_relay_chain_interface(
 			parachain_config,
 			telemetry_worker_handle,
 			task_manager,
+			None,
 		),
 	}
 }
@@ -224,7 +227,7 @@ where
 	Executor: sc_executor::NativeExecutionDispatch + 'static,
 	RB: Fn(
 			Arc<TFullClient<Block, RuntimeApi, Executor>>,
-		) -> Result<jsonrpc_core::IoHandler<sc_rpc::Metadata>, sc_service::Error>
+		) -> Result<jsonrpsee::RpcModule<()>, sc_service::Error>
 		+ Send
 		+ 'static,
 	BIC: FnOnce(
@@ -301,12 +304,12 @@ where
 				deny_unsafe,
 			};
 
-			Ok(crate::rpc::create_full(deps))
+			crate::rpc::create_full(deps).map_err(Into::into)
 		})
 	};
 
 	sc_service::spawn_tasks(sc_service::SpawnTasksParams {
-		rpc_extensions_builder,
+		rpc_builder: rpc_extensions_builder,
 		client: client.clone(),
 		transaction_pool: transaction_pool.clone(),
 		task_manager: &mut task_manager,
@@ -390,13 +393,14 @@ pub async fn start_parachain_node(
 		polkadot_config,
 		collator_options,
 		id,
-		|_| Ok(Default::default()),
+		|_| Ok(jsonrpsee::RpcModule::new(())),
 		|client,
 		 prometheus_registry,
 		 telemetry,
 		 task_manager,
 		 relay_chain_interface,
 		 transaction_pool,
+		 _sync_oracle,
 		 keystore,
 		 force_authoring| {
 
@@ -489,7 +493,7 @@ pub fn start_instant_seal_node(config: Configuration) -> Result<TaskManager, sc_
 				pool: transaction_pool.clone(),
 				deny_unsafe,
 			};
-			Ok(crate::rpc::create_full(deps))
+			crate::rpc::create_full(deps).map_err(Into::into)
 		})
 	};
 	sc_service::spawn_tasks(sc_service::SpawnTasksParams {
@@ -498,7 +502,7 @@ pub fn start_instant_seal_node(config: Configuration) -> Result<TaskManager, sc_
 		keystore: keystore_container.sync_keystore(),
 		task_manager: &mut task_manager,
 		transaction_pool: transaction_pool.clone(),
-		rpc_extensions_builder,
+		rpc_builder: rpc_extensions_builder,
 		backend,
 		system_rpc_tx,
 		config,
