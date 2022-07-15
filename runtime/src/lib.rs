@@ -605,6 +605,17 @@ impl parachain_staking::Config for Runtime {
 	type OnNewRound = ();
 	type WeightInfo = parachain_staking::weights::SubstrateWeight<Runtime>;
 }
+impl pallet_sudo::Config for Runtime {
+	type Event = Event;
+	type Call = Call;
+}
+
+impl pallet_utility::Config for Runtime {
+	type Event = Event;
+	type Call = Call;
+	type PalletsOrigin = OriginCaller;
+	type WeightInfo = pallet_utility::weights::SubstrateWeight<Runtime>;
+}
 
 
 // Create the runtime by composing the FRAME pallets that were previously configured.
@@ -622,6 +633,8 @@ construct_runtime!(
 		RandomnessCollectiveFlip: pallet_randomness_collective_flip::{Pallet, Storage} = 2,
 		Timestamp: pallet_timestamp::{Pallet, Call, Storage, Inherent} = 3,
 		ParachainInfo: parachain_info::{Pallet, Storage, Config} = 4,
+		Utility: pallet_utility::{Pallet, Call, Storage, Event} = 5,
+        Sudo: pallet_sudo::{Pallet, Call, Config<T>, Storage, Event<T>} = 6,
 
 		// Monetary stuff.
 		Balances: pallet_balances::{Pallet, Call, Storage, Config<T>, Event<T>} = 10,

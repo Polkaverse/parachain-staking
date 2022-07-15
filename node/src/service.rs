@@ -32,7 +32,6 @@ use sc_consensus_manual_seal::{run_instant_seal, InstantSealParams};
 use sc_executor::NativeElseWasmExecutor;
 use sc_network::NetworkService;
 use sc_service::{Configuration, PartialComponents, Role, TFullBackend, TFullClient, TaskManager};
-use sc_sysinfo::HwBench;
 use sc_telemetry::{Telemetry, TelemetryHandle, TelemetryWorker, TelemetryWorkerHandle};
 use sp_api::ConstructRuntimeApi;
 use sp_keystore::SyncCryptoStorePtr;
@@ -253,7 +252,7 @@ where
 
 	let parachain_config = prepare_node_config(parachain_config);
 
-	let params = new_partial::<RuntimeApi, Executor>(&parachain_config, true)?;
+	let params = new_partial::<RuntimeApi, Executor>(&parachain_config, false)?;
 	let (mut telemetry, telemetry_worker_handle) = params.other;
 
 	let client = params.client.clone();
@@ -463,7 +462,7 @@ pub fn start_instant_seal_node(config: Configuration) -> Result<TaskManager, sc_
 		select_chain,
 		transaction_pool,
 		other: (mut telemetry, _),
-	} = new_partial::<RuntimeApi, TemplateRuntimeExecutor>(&config, false)?;
+	} = new_partial::<RuntimeApi, TemplateRuntimeExecutor>(&config, true)?;
 	let (network, system_rpc_tx, network_starter) =
 		sc_service::build_network(sc_service::BuildNetworkParams {
 			config: &config,
